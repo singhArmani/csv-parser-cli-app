@@ -8,7 +8,7 @@ fs.readFile("things.csv", "utf8", function (err, data) {
   );
 
   //const dummyData = [
-  //["1 B1 +", "2 B2 *"],
+  //["1 B1 +", "2 B2 *", '*'],
   //["5", "78"],
   //];
   //const outputArray = dummyData.map((row) =>
@@ -59,12 +59,15 @@ function evaluatePostFix(expression, dataArray) {
 
       // Push the result back to stack
       stack.push(res);
+
+      // 'B1'
     } else if (/^[A-Z][0-9]$/.exec(token)) {
       // Extract col, row using regex Named capture groups
       const {
         groups: { col, row },
       } = /(?<col>^[A-Z])(?<row>\d$)/.exec(token);
 
+      // TODO: fix the infinite recursive call
       const colIdx = getIdxFromChar(col);
 
       // recursive call this evaluatePostFix and try to get the value using <col><row>
@@ -80,7 +83,7 @@ function evaluatePostFix(expression, dataArray) {
   // missing operator: '1 2'
   if (stack.length >= 2) return "#ERR";
 
-  // return the top of stac
+  // return the top of stack
   return stack[stack.length - 1];
 }
 
