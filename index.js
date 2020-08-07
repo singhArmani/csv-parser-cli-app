@@ -8,7 +8,7 @@ fs.readFile("things.csv", "utf8", function (err, data) {
   );
 
   //const dummyData = [
-  //["1 B1 +", "2 B2 *", '*'],
+  //["1 B1 +", "2 B2 *"],
   //["5", "78"],
   //];
   //const outputArray = dummyData.map((row) =>
@@ -30,12 +30,14 @@ const operationMap = {
 
 // expression: 'B1 B2 +'
 function evaluatePostFix(expression, dataArray) {
+  console.log("starting with: ", { expression });
   const stack = [];
   // split the string to array
   // ['B1', 'B2', '+']
   const tokenArray = expression.split(" ");
 
   for (let i = 0; i < tokenArray.length; i++) {
+    console.log("for loop...", { stack });
     let token = tokenArray[i];
     if (isOperand(token)) {
       // If it's an operand, keep collecting it into the stack
@@ -44,6 +46,8 @@ function evaluatePostFix(expression, dataArray) {
       // let's try to pop our operands, and perform operation on them
       const op2 = stack.pop();
       const op1 = stack.pop();
+
+      console.log({ token, op1, op2 });
 
       if (!(Boolean(op1) && Boolean(op2))) {
         // We don't have any Number type to operate on
@@ -59,21 +63,24 @@ function evaluatePostFix(expression, dataArray) {
 
       // Push the result back to stack
       stack.push(res);
-
-      // 'B1'
     } else if (/^[A-Z][0-9]$/.exec(token)) {
       // Extract col, row using regex Named capture groups
       const {
         groups: { col, row },
       } = /(?<col>^[A-Z])(?<row>\d$)/.exec(token);
 
-      // TODO: fix the infinite recursive call
+      console.log("match...", { col, row });
       const colIdx = getIdxFromChar(col);
+      console.log("index rep", { colIdx });
 
+      //console.log({ dataArray });
       // recursive call this evaluatePostFix and try to get the value using <col><row>
       const exp = dataArray[row - 1][colIdx];
 
+      console.log({ exp });
+
       const recursive = evaluatePostFix(exp, dataArray);
+      console.log({ recursive });
       stack.push(recursive);
     } else {
       return "#ERR";
@@ -83,7 +90,8 @@ function evaluatePostFix(expression, dataArray) {
   // missing operator: '1 2'
   if (stack.length >= 2) return "#ERR";
 
-  // return the top of stack
+  console.log("stack...............", { stack });
+  // return the top of stac
   return stack[stack.length - 1];
 }
 
