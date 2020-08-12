@@ -1,13 +1,14 @@
 const fs = require("fs");
 
+const {
+  isOperand,
+  isOperator,
+  getIdxFromChar,
+  operationMap,
+} = require("./utils");
+
 fs.readFile("things.csv", "utf8", function (err, data) {
   const dataArray = data.split(/\r?\n/).map((r) => r.split(","));
-
-  //const dummyData = [
-  //["B2 B1 +", "2 B2 *", "A1"],
-  //["A1", "78"],
-  //["B1", "B2"],
-  //];
 
   let resultArray = [];
   for (let i = 0; i < dataArray.length; i++) {
@@ -21,16 +22,6 @@ fs.readFile("things.csv", "utf8", function (err, data) {
   // TODO: write it to a file if we want
   console.log(resultArray);
 });
-
-const operationMap = {
-  "+": (operand1, operand2) => operand1 + operand2,
-  "-": (operand1, operand2) => operand1 - operand2,
-  "*": (operand1, operand2) => operand1 * operand2,
-  "/": (operand1, operand2) => {
-    if (operand2 == 0) throw Error();
-    return operand1 / operand2;
-  },
-};
 
 // expression: 'B1 B2 +'
 function evaluatePostFix(expression, dataArray, resultArray) {
@@ -49,7 +40,7 @@ function evaluatePostFix(expression, dataArray, resultArray) {
       const op2 = stack.pop();
       const op1 = stack.pop();
 
-      if (!(Boolean(op1) && Boolean(op2))) {
+      if (op1 === undefined || op2 === undefined) {
         // We don't have any Number type to operate on
         // NOTE: this operands checks can be don inside each function in operation map
         return "#ERR";
@@ -77,7 +68,6 @@ function evaluatePostFix(expression, dataArray, resultArray) {
       // before calling recursively, let's check if we have stored that into our result array
       let recursiveResult;
       if (Array.isArray(resultArray[row - 1]) && resultArray[row - 1][colIdx]) {
-        console.log("found it...", { token }, resultArray[row - 1][colIdx]);
         recursiveResult = resultArray[row - 1][colIdx];
       } else {
         recursiveResult = evaluatePostFix(exp, dataArray, resultArray);
@@ -89,24 +79,9 @@ function evaluatePostFix(expression, dataArray, resultArray) {
     }
   }
 
-  // missing operator: '1 2'; '1' is valid though
+  //NOTE:  missing operator: '1 2'; '1' is valid though
   if (stack.length >= 2) return "#ERR";
 
   // return the top of stac
   return stack[stack.length - 1];
-}
-
-function isOperand(symbol) {
-  // The global isNaN() function, converts the tested value to a Number, then tests it.
-  return !isNaN(symbol);
-}
-
-function isOperator(symbol) {
-  // If the symbol is part of the operationMap, then it's a valid operator
-  return Boolean(operationMap[symbol]);
-}
-
-// Get idx representation
-function getIdxFromChar(char) {
-  return char.charCodeAt() - 65;
 }
