@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+
+"use strict";
+
+const Eva = require("../eva");
+
+function main(argv) {
+  const [, , mode, exp, sep, s, notation] = argv;
+
+  const eva = new Eva();
+  if (mode === "-e") {
+    // Evalute expression only
+    const res = eva.evalExpression(exp, notation);
+    console.log(res);
+    return;
+  }
+
+  // If it's a file path
+  if (mode === "-f") {
+    try {
+      const res = eva.eval(exp, s, notation);
+      console.log(res);
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+}
+
+main(process.argv);

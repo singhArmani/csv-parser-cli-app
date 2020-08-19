@@ -1,0 +1,11 @@
+{
+  "name": "csv-parser-app",
+  "main": "index.js",
+  "repository": "https://github.com/singhArmani/csv-parser-cli-app.git",
+  "author": "singhArmani <singh_aman@hotmail.com.au>",
+  "license": "MIT",
+  "private": false,
+  "bin": {
+   "csv-parser-cli": "bin/parser"
+  }
+}
